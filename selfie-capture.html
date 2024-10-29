@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Capture Selfie</title>
+  <style>
+    /* Styling for selfie capture screen */
+    body { font-family: Arial, sans-serif; text-align: center; }
+    #video { width: 100%; max-width: 300px; border-radius: 50%; }
+    #captureButton { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Selfie Capture</h2>
+  <p>Please position yourself in front of the camera and click "Capture Selfie".</p>
+  <video id="video" autoplay></video>
+  <button id="captureButton">Capture Selfie</button>
+
+  <script>
+    const video = document.getElementById('video');
+    const captureButton = document.getElementById('captureButton');
+    let selfieImage;
+
+    // Access camera and show video
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => { video.srcObject = stream; })
+      .catch(error => console.error('Error accessing camera:', error));
+
+    // Capture the selfie
+    captureButton.onclick = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      selfieImage = canvas.toDataURL('image/jpeg');
+      
+      // Send to the verification API (through B2C custom flow)
+      document.forms[0].elements['selfie'].value = selfieImage;
+      document.forms[0].submit();
+    };
+  </script>
+  
+  <!-- Hidden form to store the captured selfie for B2C processing -->
+  <form method="post" action="{policy_return_url}">
+    <input type="hidden" name="selfie" value="">
+  </form>
+</body>
+</html>
