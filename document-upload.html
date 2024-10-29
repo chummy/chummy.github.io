@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Document</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; }
+    input[type="file"] { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Upload Official Document</h2>
+  <p>Please upload an image of your official document for verification.</p>
+  <input type="file" id="documentInput" accept="image/*">
+  <button id="uploadButton">Upload Document</button>
+
+  <script>
+    const documentInput = document.getElementById('documentInput');
+    const uploadButton = document.getElementById('uploadButton');
+
+    uploadButton.onclick = () => {
+      const file = documentInput.files[0];
+      if (!file) {
+        alert('Please select a document to upload.');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const documentImage = reader.result;
+        
+        // Send to the verification API (through B2C custom flow)
+        document.forms[0].elements['document'].value = documentImage;
+        document.forms[0].submit();
+      };
+      reader.readAsDataURL(file);
+    };
+  </script>
+
+  <!-- Hidden form to store the document for B2C processing -->
+  <form method="post" action="{policy_return_url}">
+    <input type="hidden" name="document" value="">
+  </form>
+</body>
+</html>
